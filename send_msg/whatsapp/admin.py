@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import BookOfPhone
 
-# Register your models here.
+@admin.register(BookOfPhone)
+class BookOfPhoneAdmin(admin.ModelAdmin):
+    pass
