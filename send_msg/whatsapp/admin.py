@@ -1,6 +1,18 @@
 from django.contrib import admin
-from .models import BookOfPhone
+from .models import Contact, Rodkom, Trener, Team
 
-@admin.register(BookOfPhone)
-class BookOfPhoneAdmin(admin.ModelAdmin):
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Rodkom)
+class RodkomPlayerAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Trener)
+class TrenerPlayerAdmin(admin.ModelAdmin):
     pass
