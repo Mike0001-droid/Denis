@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 STATUS_CHOICES = (
     ('Нет', 'Нет'),
@@ -8,38 +9,51 @@ STATUS_CHOICES = (
     ('Гарантия', 'Гарантия'),
 )
 
+REPRESENTATIVE_CHOICES = (
+    ('Родком', 'Родком'),
+    ('Тренер', 'Тренер'),
+)
 
-class Trener(models.Model):
-    first_name = models.CharField('Имя тренера', max_length=50)
-    last_name = models.CharField('Фамилия тренера', max_length=50)
-    otchevstvo = models.CharField('Отчество тренера', max_length=50)
-    phone = models.CharField('Номер телефона', max_length=11)
-    def __str__(self):
-        return f"{self.last_name}-{self.phone}"
+class Representative(models.Model):
+    status = models.CharField('Статус представителя команды', choices=REPRESENTATIVE_CHOICES, max_length=6)  # тренер или родитель
+    first_name = models.CharField('Имя', max_length=20)
+    last_name = models.CharField('Фамилия', max_length=20, null=True, blank=True)
+    surname = models.CharField('Отчество', max_length=20, null=True, blank=True)
+    phone = models.IntegerField('Телефон')
 
-class Rodkom(models.Model):
-    first_name = models.CharField('Имя родкома', max_length=50)
-    last_name = models.CharField('Фамилия родкома', max_length=50, null=True)
-    otchevstvo = models.CharField('Отчество родкома', max_length=50, null=True)
-    phone = models.CharField('Номер телефона', max_length=11)
     def __str__(self):
-        return f"{self.first_name}-{self.phone}"
+        return f'{self.last_name} + {self.first_name} + {self.phone}'
 
 class Team(models.Model):
-    team = models.CharField('Команда', max_length=100)
+    name = models.CharField('Название', max_length=50, null=True)
+    town = models.CharField('Город', max_length=50, null=True)
+    represent = models.ForeignKey(Representative, on_delete=models.CASCADE, related_name='representative', null=True, blank=True)
+    distance_to = models.CharField('до Апрелевки', max_length=50, null=True, blank=True)  # можно ли сделать так, чтобы расстояние считалось самостоятельно?
     year = models.IntegerField('Год рождения игроков')
-    uroven = models.CharField('Уровень', max_length=100)
-    rodkom = models.ForeignKey(Rodkom, on_delete=models.CASCADE, related_name='rodkom', null=True, blank=True)
-    trener = models.ForeignKey(Trener, on_delete=models.CASCADE, related_name='trener', null=True, blank=True)
-    an = models.IntegerField('Удаленность от катка Апрелевка')
+    level = models.CharField('Уровень', max_length=10, null=True, blank=True)  # 1, 2, 3 или 4
+
     def __str__(self):
-        return f"{self.team}"
+        return f'{self.name} + {self.year} + {self.level}'
 
+class Status(models.Model):
+    answer = models.CharField('Решение команды', choices=STATUS_CHOICES, max_length=8, null=True, blank=True)  # варианты: Жду, Думает, Будут, Гарантия, Нет
+    comment = models.CharField('Комментарий', max_length=255, null=True, blank=True)
+    last_message = models.DateTimeField('Дата последнего сообщения')
 
-class Contact(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='teams', null=True, blank=True)
-    turnir = models.CharField('Дата турнира', max_length=20)
-    status = models.CharField('Ответ', max_length=8, choices=STATUS_CHOICES, null=True, blank=True) 
-    data = models.DateTimeField('Дата последнего сообщения')
-    zametki = models.CharField('Заметки', max_length=255)
-    vazhno = models.CharField('Важно', max_length=255, blank=True)
+    def __str__(self):
+        return f'{self.answer}'
+
+class Tournament(models.Model):
+    town = models.CharField('Город', max_length=50, default='Апрелевка')
+    ice_rink = models.CharField('Название катка', max_length=50, default='April_ice')
+    team = models.ManyToManyField(Team)
+    status = models.ForeignKey(Status, on_delete=models.CASCADE, related_name='status', null=True, blank=True)
+    data = models.DateField('Даты проведения')
+
+    #TODO
+    """ def data(self):
+        dirname = datetime.now().strftime('%Y/%m/%d')
+        return  """
+
+    def __str__(self):
+        return f'{self.ice_rink} + {self.data}'
