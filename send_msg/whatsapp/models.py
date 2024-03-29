@@ -13,7 +13,7 @@ class Trener(models.Model):
     first_name = models.CharField('Имя тренера', max_length=50)
     last_name = models.CharField('Фамилия тренера', max_length=50)
     otchevstvo = models.CharField('Отчество тренера', max_length=50)
-    phone = models.CharField('Номер телефона', max_length=11)
+    phone = models.CharField('Номер телефона', max_length=12)
     def __str__(self):
         return f"{self.last_name}-{self.phone}"
 
@@ -35,7 +35,6 @@ class Team(models.Model):
     def __str__(self):
         return f"{self.team}"
 
-
 class Contact(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='teams', null=True, blank=True)
     turnir = models.CharField('Дата турнира', max_length=20)
@@ -43,3 +42,5 @@ class Contact(models.Model):
     data = models.DateTimeField('Дата последнего сообщения')
     zametki = models.CharField('Заметки', max_length=255)
     vazhno = models.CharField('Важно', max_length=255, blank=True)
+
+    
